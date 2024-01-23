@@ -9,4 +9,5 @@ export interface PedidoOutput {
     cliente: string;
     statusPagamento: StatusPagamentoEnum;
     statusPedido: StatusPedidoEnum;
+    codigoParaPagamento?: string;
 }

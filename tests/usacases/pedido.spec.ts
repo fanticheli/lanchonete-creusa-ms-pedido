@@ -1,3 +1,4 @@
+import axios, { AxiosResponse } from "axios";
 import { CategoriaEnum } from "../../src/common/enum/categoria-enum";
 import { StatusPagamentoEnum } from "../../src/common/enum/status-pagamento-enum";
 import { StatusPedidoEnum } from "../../src/common/enum/status-pedido-enum";
@@ -8,11 +9,21 @@ import { ProdutoRepositoryInMemory } from "../../src/external/memory/produto.rep
 import { PedidoUseCases } from "../../src/usecases/pedido";
 import { ProdutoUseCases } from "../../src/usecases/produtos";
 
+jest.mock('axios');
+
 describe("Pedido", () => {
 	const produtoRepository = new ProdutoRepositoryInMemory();
 	const pedidoRepository = new PedidoRepositoryInMemory();
 
 	test("Deve criar um pedido", async () => {
+		const mockResponse = {
+			data: {
+				codigoPix: "123456789",
+			},
+		};
+
+		axios.post.mockImplementation(() => Promise.resolve(mockResponse));
+
 		const produtoProps: ProdutoProps = {
 			id: "1",
 			descricao: "Produto 1",

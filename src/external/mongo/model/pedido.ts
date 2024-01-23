@@ -8,6 +8,7 @@ const PedidoSchema = new mongoose.Schema(
 		numeroPedido: Number,
 		statusPagamento: String,
 		statusPedido: String,
+		codigoParaPagamento: String
 	},
 	{
 		timestamps: true,

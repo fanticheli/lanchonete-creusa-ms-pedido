@@ -31,6 +31,18 @@ export class PedidoRepositoryInMemory implements IPedidoGateway {
 		return pedidoEncontrado.object;
 	}
 
+	async BuscarPedidoPorCodigoPagamento(codigoPagamento: string): Promise<PedidoOutput | null> {
+		const pedidoEncontrado = this.pedidos.find(
+			(pedido) => pedido.codigoParaPagamento === codigoPagamento
+		);
+
+		if (!pedidoEncontrado) {
+			return null;
+		}
+
+		return pedidoEncontrado.object;
+	}
+
 	async EditarPedido(editarPedidoDTO: PedidoProps): Promise<PedidoOutput> {
 		if (!editarPedidoDTO.id) {
 			throw new Error("ID do Pedido não informado");
@@ -44,9 +56,5 @@ export class PedidoRepositoryInMemory implements IPedidoGateway {
 		});
 
 		return editarPedidoDTO;
-	}
-
-	async ListarPedidos(): Promise<PedidoOutput[]> {
-		return this.pedidos.map((pedido) => pedido.object);
 	}
 }

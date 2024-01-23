@@ -10,6 +10,7 @@ export class Pedido {
 	private _cliente: string;
 	private _statusPagamento: StatusPagamentoEnum;
 	private _statusPedido: StatusPedidoEnum;
+	private _codigoParaPagento?: string;
 
 	constructor(pedidoProps: PedidoProps) {
 		this._id = pedidoProps.id || undefined;
@@ -51,6 +52,10 @@ export class Pedido {
 		return this._statusPedido;
 	}
 
+	get codigoParaPagamento(): string | undefined {
+		return this._codigoParaPagento;
+	}
+
 	get object() {
 		return {
 			id: this._id,
@@ -60,6 +65,7 @@ export class Pedido {
 			cliente: this._cliente,
 			statusPagamento: this._statusPagamento,
 			statusPedido: this._statusPedido,
+			codigoParaPagamento: this._codigoParaPagento,
 		};
 	}
 
@@ -81,6 +87,10 @@ export class Pedido {
 
 	set numeroPedido(numeroPedido: number) {
 		this._numeroPedido = numeroPedido;
+	}
+
+	set codigoParaPagamento(codigoParaPagamento: string) {
+		this._codigoParaPagento = codigoParaPagamento;
 	}
 
 	aprovarPagamento() {

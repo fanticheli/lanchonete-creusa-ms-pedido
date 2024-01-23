@@ -9,4 +9,6 @@ export type PedidoProps = {
     numeroPedido: number;
     statusPagamento: StatusPagamentoEnum;
     statusPedido: StatusPedidoEnum;
+    codigoParaPagamento?: string;
+    idPagamento?: string;
 };

@@ -20,4 +20,42 @@ export class PedidoRepositoryInMongo implements IPedidoGateway {
 		const quantidadePedidos = await this._model.countDocuments();
 		return quantidadePedidos + 1;
 	}
+
+	async BuscarPedidoPorID(pedidoID: string): Promise<PedidoOutput | null> {
+		if (!ObjectId.isValid(pedidoID)) {
+			throw new Error("ID inválido");
+		}
+
+		const pedidoEncontrado = await this._model.findById(pedidoID);
+
+		if (!pedidoEncontrado) {
+			return null;
+		}
+
+		return pedidoEncontrado;
+	}
+
+	async BuscarPedidoPorCodigoPagamento(codigoPagamento: string): Promise<PedidoOutput | null> {
+		if (!codigoPagamento) {
+			throw new Error("Código de pagamento inválido");
+		}
+
+		const pedidoEncontrado = await this._model.findOne({codigoParaPagamento: codigoPagamento});
+
+		if (!pedidoEncontrado) {
+			return null;
+		}
+
+		return pedidoEncontrado;
+	}
+
+	async EditarPedido(pedidoEditar: PedidoProps): Promise<PedidoOutput> {
+		if (!pedidoEditar.id || !ObjectId.isValid(pedidoEditar.id)) {
+			throw new Error("ID inválido");
+		}
+
+		return this._model.findByIdAndUpdate(pedidoEditar.id, pedidoEditar, {
+			new: true,
+		});
+	}
 }
