@@ -9,9 +9,6 @@
     "start": "node dist/src/index.js",
     "build": "npx tsc"
   },
-  "jest": {
-    "coverageReporters": ["lcov", "text"]
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/fanticheli/lanchonete-creusa-ms-pedido.git"
