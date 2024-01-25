@@ -84,11 +84,56 @@ router.put("/status-pagamento/:codigo", async (req: Request, res: Response) => {
 
 	await PedidoController.AlterarStatusPagamentoPedido(
 		pedidoRepositoryInMongo,
+		produtoRepositoryInMongo,
 		req.params.codigo,
 		statusPagamento
 	)
 		.then((response: any) => {
 			res.status(200).send({ statusPagamento: response.statusPagamento });
+		})
+		.catch((err: any) => {
+			res.status(400).send({ message: err?.message });
+		});
+});
+
+/**
+ * @swagger
+ * /api/pedidos/{id}/status-pedido:
+ *   put:
+ *     summary: Altera status do pedido do pedido por id
+ *     tags: [Pedido]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID do pedido a ser alterado.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               statusPedido:
+ *                 type: string
+ *             example:
+ *               statusPedido: "Em preparação"
+ *     responses:
+ *       200:
+ *         description: Status do pedido do pedido alterado com sucesso.
+ */
+router.put("/:id/status-pedido", async (req: Request, res: Response) => {
+	const statusPedido = req.body.statusPedido;
+
+	await PedidoController.AlterarStatusPedido(
+		pedidoRepositoryInMongo,
+		req.params.id,
+		statusPedido
+	)
+		.then((response: any) => {
+			res.status(200).send({ statusPedido: response.statusPedido });
 		})
 		.catch((err: any) => {
 			res.status(400).send({ message: err?.message });

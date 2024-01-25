@@ -1,7 +1,7 @@
 export enum StatusPedidoEnum {
   RECEBIDO = 'Recebido',
   PREPARACAO = 'Em preparação',
-  PRONTO = 'pronto',
+  PRONTO = 'Pronto',
   FINALIZADO = 'Finalizado',
   CANCELADO = 'Cancelado'
 }

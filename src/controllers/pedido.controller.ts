@@ -1,5 +1,6 @@
 import { PedidoOutput } from "../adapters/pedido";
 import { StatusPagamentoEnum } from "../common/enum/status-pagamento-enum";
+import { StatusPedidoEnum } from "../common/enum/status-pedido-enum";
 import { PedidoProps } from "../entities/props/pedido.props";
 import { IPedidoGateway } from "../interfaces/gateway/pedido.gateway.interface";
 import { IProdutoGateway } from "../interfaces/gateway/produto.gateway.interface";
@@ -24,14 +25,32 @@ export class PedidoController {
 
 	static async AlterarStatusPagamentoPedido(
 		pedidoGatewayInterface: IPedidoGateway,
+		produtoGatewayInterface: IProdutoGateway,
 		codigoPagamento: string,
 		statusPagamento: StatusPagamentoEnum
 	): Promise<PedidoOutput | null> {
 		try {
 			return await PedidoUseCases.AlterarStatusPagamentoPedido(
 				pedidoGatewayInterface,
+				produtoGatewayInterface,
 				codigoPagamento,
 				statusPagamento
+			);
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	static async AlterarStatusPedido(
+		pedidoGatewayInterface: IPedidoGateway,
+		pedidoID: string,
+		statusPedido: StatusPedidoEnum
+	): Promise<PedidoOutput | null> {
+		try {
+			return await PedidoUseCases.AlterarStatusPedido(
+				pedidoGatewayInterface,
+				pedidoID,
+				statusPedido
 			);
 		} catch (error) {
 			throw error;

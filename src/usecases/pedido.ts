@@ -60,6 +60,7 @@ export class PedidoUseCases {
 
 	static async AlterarStatusPagamentoPedido(
 		pedidoGatewayInterface: IPedidoGateway,
+		produtoGatewayInterface: IProdutoGateway,
 		codigoPagamento: string,
 		statusPagamento: StatusPagamentoEnum
 	): Promise<PedidoOutput> {
@@ -80,9 +81,70 @@ export class PedidoUseCases {
 		if (statusPagamento === StatusPagamentoEnum.NEGADO) {
 			pedidoEncontrado.statusPedido = StatusPedidoEnum.CANCELADO;
 		} else if (statusPagamento === StatusPagamentoEnum.APROVADO) {
-			//TODO: chamar endpoint de produção
 			pedidoEncontrado.statusPedido = StatusPedidoEnum.PREPARACAO;
+
+			await PedidoUseCases.MandarPedidoParaProducao(pedidoEncontrado, produtoGatewayInterface);
 		}
+
+		return pedidoGatewayInterface.EditarPedido(pedidoEncontrado);
+	}
+
+	static async MandarPedidoParaProducao(
+		pedido: PedidoOutput,
+		produtoGatewayInterface: IProdutoGateway
+	): Promise<any> {
+
+		const apiUrl = process.env.URL_MS_PRODUCAO || '';
+
+		if (!apiUrl) {
+			throw new Error('Webhook de PRODUÇÃO não configurado');
+		}
+
+		try {
+
+			const produtos = await Promise.all(pedido.produtos.map(async (produto) => {
+				const produtoEncontrado = await produtoGatewayInterface.BuscarProdutoPorID(produto);
+	
+				if (!produtoEncontrado) {
+					throw new Error(`Produto: ${produto} não encontrado`);
+				}
+	
+				return {descricao: produtoEncontrado.descricao, valor: produtoEncontrado.valor};
+			}));
+
+			const result = await axios.post(`${apiUrl}`, {
+				"id": pedido.id,
+				"cliente": pedido.cliente,
+				"produtos": produtos,
+				"numeroPedido": pedido.numeroPedido
+			});
+
+			return result.data;
+		}
+		catch (error) {
+			throw new Error('Não foi possível chamar o webhook de produção');
+		}
+
+	}
+
+	static async AlterarStatusPedido(
+		pedidoGatewayInterface: IPedidoGateway,
+		pedidoID: string,
+		statusPedido: StatusPedidoEnum
+	): Promise<PedidoOutput> {
+		if (!Object.values(StatusPedidoEnum).includes(statusPedido)) {
+			throw new Error("Status de pedido inválido");
+		}
+
+		const pedidoEncontrado = await pedidoGatewayInterface.BuscarPedidoPorID(
+			pedidoID
+		);
+
+		if (!pedidoEncontrado) {
+			throw new Error("Pedido não encontrado");
+		}
+
+		pedidoEncontrado.statusPedido = statusPedido;
 
 		return pedidoGatewayInterface.EditarPedido(pedidoEncontrado);
 	}
