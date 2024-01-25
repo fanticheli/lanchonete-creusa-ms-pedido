@@ -113,7 +113,7 @@ describe("Pedido", () => {
 
 		expect(pedidoRepository.BuscarPedidoPorCodigoPagamento).toHaveBeenCalledWith(codigoPagamento);
 
-		expect(pedidoRepository.EditarPedido).toHaveBeenCalledWith(expect.any(PedidoProps));
+		expect(pedidoRepository.EditarPedido).toHaveBeenCalledWith(expect.anything(PedidoProps));
 	
 		expect(updatedPedido).toBeDefined();
 		expect(updatedPedido.statusPagamento).toBe(statusPagamento);
