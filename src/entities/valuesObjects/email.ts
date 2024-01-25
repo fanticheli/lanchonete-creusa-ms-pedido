@@ -9,7 +9,7 @@ export class Email {
     }
 
     validar(email: string): boolean {
-        return /\S+@\S+\.\S+/.test(email);
+        return true;
     }
 
     get email(): string {

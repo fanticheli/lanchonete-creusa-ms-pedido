@@ -8,6 +8,7 @@ import { PedidoRepositoryInMemory } from "../../src/external/memory/pedido.repos
 import { ProdutoRepositoryInMemory } from "../../src/external/memory/produto.repository";
 import { PedidoUseCases } from "../../src/usecases/pedido";
 import { ProdutoUseCases } from "../../src/usecases/produtos";
+import { PedidoOutput } from "../../src/adapters/pedido";
 
 jest.mock('axios');
 
@@ -22,7 +23,7 @@ describe("Pedido", () => {
 			},
 		};
 
-		axios.post.mockImplementation(() => Promise.resolve(mockResponse));
+		(axios.post as jest.Mock).mockImplementation(() => Promise.resolve(mockResponse));
 
 		const produtoProps: ProdutoProps = {
 			id: "1",
@@ -66,7 +67,7 @@ describe("Pedido", () => {
 		  },
 		};
 	
-		axios.post.mockImplementation(() => Promise.resolve(mockResponse));
+		(axios.post as jest.Mock).mockImplementation(() => Promise.resolve(mockResponse));
 	
 		const pedidoProps: PedidoProps = {
 		  produtos: ['1'],
@@ -83,22 +84,12 @@ describe("Pedido", () => {
 	  });
 
 	  test('Deve alterar o status do pagamento do pedido', async () => {
-		const pedidoEncontradoMock: PedidoOutput = {
+		const pedidoEncontradoMock = {
 		  id: '1',
 		  statusPagamento: StatusPagamentoEnum.PENDENTE,
 		  statusPedido: StatusPedidoEnum.RECEBIDO,
 		};
 
-
-		const pedidoProps: PedidoProps = {
-			produtos: ['1'],
-			cliente: 'Cliente 1',
-			valorTotal: 0,
-			numeroPedido: 0,
-			statusPagamento: StatusPagamentoEnum.PENDENTE,
-			statusPedido: StatusPedidoEnum.RECEBIDO,
-		  };
-	  
 
 		const codigoPagamento = '123456789';
 		const statusPagamento = StatusPagamentoEnum.APROVADO;
@@ -118,9 +109,9 @@ describe("Pedido", () => {
 		expect(updatedPedido).toBeDefined();
 		expect(updatedPedido.statusPagamento).toBe(statusPagamento);
 	
-		if (statusPagamento === StatusPagamentoEnum.NEGADO) {
+		if (updatedPedido.statusPagamento === StatusPagamentoEnum.NEGADO) {
 		  expect(updatedPedido.statusPedido).toBe(StatusPedidoEnum.CANCELADO);
-		} else if (statusPagamento === StatusPagamentoEnum.APROVADO) {
+		} else if (updatedPedido.statusPagamento === StatusPagamentoEnum.APROVADO) {
 		  expect(updatedPedido.statusPedido).toBe(StatusPedidoEnum.PREPARACAO);
 		}
 	  });
