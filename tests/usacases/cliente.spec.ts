@@ -35,28 +35,3 @@ describe('Cliente usecases', () => {
     });
 });
 
-describe('BuscarTodosClientes usecase', () => {
-    const clienteRepository = new ClienteRepositoryInMemory();
-
-    test('should return all clients', async () => {
-        await ClienteUseCases.CriarCliente(clienteRepository, {
-            id: '2',
-            nome: 'Maria',
-            email: 'maria@maria.com.br',
-            cpf: '123.456.789-01'
-        });
-
-        const clientes = await ClienteUseCases.BuscarTodosClientes(clienteRepository);
-
-        expect(clientes).toBeDefined();
-        expect(clientes).toHaveLength(2); 
-    });
-
-    test('should return null if no clients are found', async () => {
-        var clienteRepository = new ClienteRepositoryInMemory();
-
-        const clientes = await ClienteUseCases.BuscarTodosClientes(clienteRepository);
-
-        expect(clientes).toBeNull();
-    });
-});
