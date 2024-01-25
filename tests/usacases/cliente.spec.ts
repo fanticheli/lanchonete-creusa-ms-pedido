@@ -43,7 +43,7 @@ describe('BuscarTodosClientes usecase', () => {
             id: '2',
             nome: 'Maria',
             email: 'maria@maria.com.br',
-            cpf: '321.466.799-01'
+            cpf: '123.456.789-01'
         });
 
         const clientes = await ClienteUseCases.BuscarTodosClientes(clienteRepository);
@@ -53,7 +53,7 @@ describe('BuscarTodosClientes usecase', () => {
     });
 
     test('should return null if no clients are found', async () => {
-        clienteRepository.clear();
+        var clienteRepository = new ClienteRepositoryInMemory();
 
         const clientes = await ClienteUseCases.BuscarTodosClientes(clienteRepository);
 

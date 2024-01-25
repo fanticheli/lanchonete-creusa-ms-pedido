@@ -88,7 +88,7 @@ describe("Pedido", () => {
 		  statusPagamento: StatusPagamentoEnum.PENDENTE,
 		  statusPedido: StatusPedidoEnum.RECEBIDO,
 		};
-	
+
 		const codigoPagamento = '123456789';
 		const statusPagamento = StatusPagamentoEnum.APROVADO;
 
