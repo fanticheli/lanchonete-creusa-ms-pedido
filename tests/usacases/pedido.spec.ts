@@ -100,6 +100,8 @@ describe("Pedido", () => {
 		  statusPagamento
 		);
 	
+		pedidoRepository.EditarPedido = jest.fn();
+
 		expect(pedidoRepository.BuscarPedidoPorCodigoPagamento).toHaveBeenCalledWith(codigoPagamento);
 		expect(pedidoRepository.EditarPedido).toHaveBeenCalledWith(expect.any(Object));
 	
