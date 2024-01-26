@@ -39,13 +39,12 @@ const produtoRepositoryInMongo = new ProdutoRepositoryInMongo();
  *         description: Produto criado com sucesso.
  */
 router.post("/", async (req: Request, res: Response) => {
-	return await ProdutoController.CriarProduto(produtoRepositoryInMongo, req.body)
-		.then((response: any) => {
-			return res.status(201).send(response);
-		})
-		.catch((err: any) => {
-			return res.status(400).send({ message: err?.message });
-		});
+	try {
+		const response = await ProdutoController.CriarProduto(produtoRepositoryInMongo, req.body);
+		return res.status(201).send(response);
+	} catch (err: any) {
+		return res.status(400).send({ message: err?.message })
+	}
 });
 
 /**
@@ -68,12 +67,13 @@ router.post("/", async (req: Request, res: Response) => {
  */
 router.get("/descricao/:descricao", async (req, res) => {
 	res.setHeader("Content-type", "application/json");
-	return res.json(
-		await ProdutoController.BuscarProdutoPorDescricao(
-			produtoRepositoryInMongo,
-			req.params.descricao
-		)
+
+	const response = await ProdutoController.BuscarProdutoPorDescricao(
+		produtoRepositoryInMongo,
+		req.params.descricao
 	);
+
+	return res.json(response);
 });
 
 /**
@@ -96,11 +96,12 @@ router.get("/descricao/:descricao", async (req, res) => {
  */
 router.get("/categoria/:categoria", async (req, res) => {
 	res.setHeader("Content-type", "application/json");
+	const response = await ProdutoController.BuscarProdutoPorCategoria(
+		produtoRepositoryInMongo,
+		req.params.categoria
+	)
 	return res.json(
-		await ProdutoController.BuscarProdutoPorCategoria(
-			produtoRepositoryInMongo,
-			req.params.categoria
-		)
+		response
 	);
 });
 
@@ -135,13 +136,12 @@ router.get("/categoria/:categoria", async (req, res) => {
  *         description: Produto editado com sucesso.
  */
 router.put("/", async (req: Request, res: Response) => {
-	return await ProdutoController.EditarProduto(produtoRepositoryInMongo, req.body)
-		.then((response: any) => {
-			return res.status(204).send(response);
-		})
-		.catch((err: any) => {
-			return res.status(400).send({ message: err?.message });
-		});
+	try {
+		const response = await ProdutoController.EditarProduto(produtoRepositoryInMongo, req.body)
+		return res.status(204).send(response);
+	} catch (error: any) {
+		return res.status(400).send({ message: error?.message });
+	}
 });
 
 /**
@@ -163,16 +163,16 @@ router.put("/", async (req: Request, res: Response) => {
  *         description: Produto encontrado
  */
 router.delete("/:id", async (req: Request, res: Response) => {
-	return await ProdutoController.DeletarProduto(
-		produtoRepositoryInMongo,
-		req.params.id
-	)
-		.then((response: any) => {
-			return res.status(201).send(response);
-		})
-		.catch((err: any) => {
-			return res.status(400).send({ message: err?.message });
-		});
+	try {
+		const response = await ProdutoController.DeletarProduto(
+			produtoRepositoryInMongo,
+			req.params.id
+		)
+		return res.status(201).send(response);
+	}
+	catch (err: any) {
+		return res.status(400).send({ message: err?.message });
+	}
 });
 
 module.exports = router;
