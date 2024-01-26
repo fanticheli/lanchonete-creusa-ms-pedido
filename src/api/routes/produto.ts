@@ -50,6 +50,8 @@ router.post("/", async (req: Request, res: Response) => {
 	}
 });
 
+
+
 /**
  * @swagger
  * /api/produtos/descricao/{descricao}:
