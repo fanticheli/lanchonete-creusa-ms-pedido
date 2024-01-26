@@ -8,7 +8,7 @@ export class LanchoneteCreusa {
 		const swaggerUi = require("swagger-ui-express");
 		const swaggerSpec = require("./swagger");
 		lanchoneteCreusa.use(express.json());
-		const PORT = process.env.PORT || 9000;
+		const PORT = process.env.PORT || 3000;
 
 		const docsRoutes = require("./routes/docs");
 		const indexRoutes = require("./routes/routes");
