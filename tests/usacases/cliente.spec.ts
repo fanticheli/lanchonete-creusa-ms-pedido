@@ -3,7 +3,11 @@ import { ClienteRepositoryInMemory } from "../../src/external/memory/cliente.rep
 import { ClienteUseCases } from "../../src/usecases/cliente";
 
 describe('Cliente usecases', () => {
-    const clienteRepository = new ClienteRepositoryInMemory();
+    let clienteRepository = new ClienteRepositoryInMemory();
+
+    beforeEach(() => {
+        clienteRepository = new ClienteRepositoryInMemory();
+    })
 
     test('should create a new client', async () => {
         const clienteProps: ClienteProps = {
@@ -24,9 +28,32 @@ describe('Cliente usecases', () => {
         expect(clientes).toHaveLength(1);
     });
 
+    test('should create a new client, with error Cliente já cadastrado', async () => {
+        const clienteProps: ClienteProps = {
+            id: '1',
+            nome: 'João',
+            email: 'joão@joão.com.br',
+            cpf: '360.635.210-70'
+        }
+        await ClienteUseCases.CriarCliente(clienteRepository, clienteProps);
+        try {
+            await ClienteUseCases.CriarCliente(clienteRepository, clienteProps);
+        } catch (error: any) {
+            expect(error.message).toBe('Cliente já cadastrado');
+        }
+
+    });
+
     test('should find a client by CPF', async () => {
+        const clienteProps: ClienteProps = {
+            id: '1',
+            nome: 'João',
+            email: 'joão@joão.com.br',
+            cpf: '360.635.210-70'
+        }
+        await ClienteUseCases.CriarCliente(clienteRepository, clienteProps);
         const cliente = await ClienteUseCases.BuscarClientePorCPF(clienteRepository, '36063521070');
-        
+
         expect(cliente).toBeDefined();
         expect(cliente?.id).toBe('1');
         expect(cliente?.nome).toBe('João');

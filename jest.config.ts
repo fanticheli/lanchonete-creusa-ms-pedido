@@ -23,7 +23,7 @@ const config: Config = {
   clearMocks: true,
 
   // Indicates whether the coverage information should be collected while executing the test
-  // collectCoverage: false,
+  collectCoverage: true,
 
   // An array of glob patterns indicating a set of files for which coverage information should be collected
   collectCoverageFrom: ['src/**/*.{ts,js}'],
@@ -39,7 +39,7 @@ const config: Config = {
     "src/interfaces",
     "src/index",
     "src/controllers",
-    "src/entities",
+    "src/entities/props",
   ],
 
   // Indicates which provider should be used to instrument code for coverage
@@ -56,10 +56,10 @@ const config: Config = {
   // An object that configures minimum threshold enforcement for coverage results
   coverageThreshold: {
     global: {
-      branches: 70,
-      functions: 70,
-      lines: 70,
-      statements: 70,
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80,
     },
   },
 
