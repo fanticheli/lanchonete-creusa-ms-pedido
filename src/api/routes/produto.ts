@@ -41,9 +41,11 @@ const produtoRepositoryInMongo = new ProdutoRepositoryInMongo();
 router.post("/", async (req: Request, res: Response) => {
 	try {
 		const response = await ProdutoController.CriarProduto(produtoRepositoryInMongo, req.body);
-		return res.status(201).send(response);
+		res.status(201).send(response);
+		return;
 	} catch (err: any) {
-		return res.status(400).send({ message: err?.message })
+		res.status(400).send({ message: err?.message })
+		return;
 	}
 });
 
@@ -73,7 +75,8 @@ router.get("/descricao/:descricao", async (req, res) => {
 		req.params.descricao
 	);
 
-	return res.json(response);
+	res.json(response);
+	return;
 });
 
 /**
@@ -100,9 +103,10 @@ router.get("/categoria/:categoria", async (req, res) => {
 		produtoRepositoryInMongo,
 		req.params.categoria
 	)
-	return res.json(
+	res.json(
 		response
 	);
+	return;
 });
 
 /**
@@ -138,9 +142,11 @@ router.get("/categoria/:categoria", async (req, res) => {
 router.put("/", async (req: Request, res: Response) => {
 	try {
 		const response = await ProdutoController.EditarProduto(produtoRepositoryInMongo, req.body)
-		return res.status(204).send(response);
+		res.status(204).send(response);
+		return;
 	} catch (error: any) {
-		return res.status(400).send({ message: error?.message });
+		res.status(400).send({ message: error?.message });
+		return;
 	}
 });
 
@@ -168,10 +174,12 @@ router.delete("/:id", async (req: Request, res: Response) => {
 			produtoRepositoryInMongo,
 			req.params.id
 		)
-		return res.status(201).send(response);
+		res.status(201).send(response);
+		return;
 	}
 	catch (err: any) {
-		return res.status(400).send({ message: err?.message });
+		res.status(400).send({ message: err?.message });
+		return;
 	}
 });
 
