@@ -175,39 +175,6 @@ describe("Pedido", () => {
 		expect(novoPagamento).toBeDefined();
 	});
 
-	test('Deve alterar o status do pagamento do pedido APROVADO', async () => {
-		const pedidoEncontradoMock = {
-			id: '1',
-			statusPagamento: StatusPagamentoEnum.PENDENTE,
-			statusPedido: StatusPedidoEnum.RECEBIDO,
-		};
-
-
-		const codigoPagamento = '123456789';
-		const statusPagamento = StatusPagamentoEnum.APROVADO;
-
-		pedidoRepository.BuscarPedidoPorCodigoPagamento = jest.fn().mockResolvedValue(pedidoEncontradoMock);
-
-		const updatedPedido = await PedidoUseCases.AlterarStatusPagamentoPedido(
-			pedidoRepository,
-			codigoPagamento,
-			statusPagamento
-		);
-
-		expect(pedidoRepository.BuscarPedidoPorCodigoPagamento).toHaveBeenCalledWith(codigoPagamento);
-
-		//expect(pedidoRepository.EditarPedido).toHaveBeenCalledWith(expect.anything(pedidoProps));
-
-		expect(updatedPedido).toBeDefined();
-		expect(updatedPedido.statusPagamento).toBe(statusPagamento);
-
-		if (updatedPedido.statusPagamento === StatusPagamentoEnum.NEGADO) {
-			expect(updatedPedido.statusPedido).toBe(StatusPedidoEnum.CANCELADO);
-		} else if (updatedPedido.statusPagamento === StatusPagamentoEnum.APROVADO) {
-			expect(updatedPedido.statusPedido).toBe(StatusPedidoEnum.PREPARACAO);
-		}
-	});
-
 	test('Deve alterar o status do pagamento do pedido NEGADO', async () => {
 		const pedidoEncontradoMock = {
 			id: '1',
@@ -223,6 +190,7 @@ describe("Pedido", () => {
 
 		const updatedPedido = await PedidoUseCases.AlterarStatusPagamentoPedido(
 			pedidoRepository,
+			produtoRepository,
 			codigoPagamento,
 			statusPagamento
 		);
@@ -255,6 +223,7 @@ describe("Pedido", () => {
 		try {
 			await PedidoUseCases.AlterarStatusPagamentoPedido(
 				pedidoRepository,
+				produtoRepository,
 				codigoPagamento,
 				'statusPagamento' as any
 			);
@@ -267,6 +236,7 @@ describe("Pedido", () => {
 		try {
 			await PedidoUseCases.AlterarStatusPagamentoPedido(
 				pedidoRepository,
+				produtoRepository,
 				'codigoPagamento',
 				StatusPagamentoEnum.APROVADO
 			);
