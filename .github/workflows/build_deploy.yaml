@@ -1,0 +1,62 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set up Docker Buildx
+        run: |
+          curl -fsSL https://get.docker.com -o get-docker.sh
+          sh get-docker.sh
+          docker buildx create --use
+        shell: bash
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t acrlanchonete.azurecr.io/lanchonetecreusa-ms-pedido:${{ github.sha }} .
+          docker login acrlanchonete.azurecr.io -u acrlanchonete -p ${{ secrets.ACR_PASSWORD }}
+          docker push acrlanchonete.azurecr.io/lanchonetecreusa-ms-pedido:${{ github.sha }}
+        env:
+          ACR_REGISTRY: acrlanchonete.azurecr.io
+          ACR_REPOSITORY: lanchonetecreusa-ms-pedido
+        shell: bash
+
+      - name: Clone repository with Kubernetes manifests
+        run: |
+          git clone https://github.com/fanticheli/lanchonte-creusa-kubernetes.git /tmp/k8s-manifests
+        env:
+          K8S_REPO: https://github.com/fanticheli/lanchonte-creusa-kubernetes.git
+
+      - name: Replace image tag in Kubernetes manifest
+        run: |
+          sed -i "s/{{.Values.imageTag}}/${{ github.sha }}/g" k8s/ms-pedido/deployment.yaml
+        working-directory: /tmp/k8s-manifests
+      
+      - name: Set up kubectl
+        uses: azure/aks-set-context@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          cluster-name: kubernetes_cluster
+          resource-group: resource_lanchonete
+
+      - name: Deploy to AKS
+        run: |
+          kubectl apply -f k8s --force && kubectl apply -f k8s/ms-pedido --force
+        working-directory: /tmp/k8s-manifests
+
+      - name: Logout from Azure
+        run: az logout
