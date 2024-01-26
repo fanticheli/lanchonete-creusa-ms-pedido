@@ -39,7 +39,7 @@ const produtoRepositoryInMongo = new ProdutoRepositoryInMongo();
  *         description: Produto criado com sucesso.
  */
 router.post("/", async (req: Request, res: Response) => {
-	await ProdutoController.CriarProduto(produtoRepositoryInMongo, req.body)
+	return await ProdutoController.CriarProduto(produtoRepositoryInMongo, req.body)
 		.then((response: any) => {
 			res.status(201).send(response);
 		})
@@ -67,7 +67,7 @@ router.post("/", async (req: Request, res: Response) => {
  *         description: Produto encontrado
  */
 router.get("/descricao/:descricao", async (req, res) => {
-	res.setHeader("Content-type", "application/json");
+	return res.setHeader("Content-type", "application/json");
 	res.json(
 		await ProdutoController.BuscarProdutoPorDescricao(
 			produtoRepositoryInMongo,
@@ -95,7 +95,7 @@ router.get("/descricao/:descricao", async (req, res) => {
  *         description: Produto encontrado
  */
 router.get("/categoria/:categoria", async (req, res) => {
-	res.setHeader("Content-type", "application/json");
+	return res.setHeader("Content-type", "application/json");
 	res.json(
 		await ProdutoController.BuscarProdutoPorCategoria(
 			produtoRepositoryInMongo,
@@ -135,7 +135,7 @@ router.get("/categoria/:categoria", async (req, res) => {
  *         description: Produto editado com sucesso.
  */
 router.put("/", async (req: Request, res: Response) => {
-	await ProdutoController.EditarProduto(produtoRepositoryInMongo, req.body)
+	return await ProdutoController.EditarProduto(produtoRepositoryInMongo, req.body)
 		.then((response: any) => {
 			res.status(204).send(response);
 		})
@@ -163,7 +163,7 @@ router.put("/", async (req: Request, res: Response) => {
  *         description: Produto encontrado
  */
 router.delete("/:id", async (req: Request, res: Response) => {
-	await ProdutoController.DeletarProduto(
+	return await ProdutoController.DeletarProduto(
 		produtoRepositoryInMongo,
 		req.params.id
 	)

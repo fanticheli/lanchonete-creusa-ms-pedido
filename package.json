@@ -4,7 +4,7 @@
   "description": "Sistema de pedidos para lanchonetes. Cadastro de clientes, gestão de produtos e acompanhamento em tempo real. Desenvolvido em Nodejs e MongoDB utilizando Clean Arch. Melhore o atendimento e satisfação dos clientes.",
   "main": "src/index.ts",
   "scripts": {
-    "test": "jest --coverage",
+    "test": "jest --clearCache && jest --coverage",
     "dev": "nodemon .",
     "start": "node dist/src/index.js",
     "build": "npx tsc"

@@ -1,10 +1,13 @@
-import { ClienteProps } from "../../src/entities/props/cliente.props"
-import { ClienteRepositoryInMemory } from "../../src/external/memory/cliente.repository"
-import { ClienteUseCases } from "../../src/usecases/cliente"
+import { ClienteProps } from "../../src/entities/props/cliente.props";
+import { ClienteRepositoryInMemory } from "../../src/external/memory/cliente.repository";
+import { ClienteUseCases } from "../../src/usecases/cliente";
 
 describe('Cliente usecases', () => {
+    let clienteRepository = new ClienteRepositoryInMemory();
 
-    const clienteRepository = new ClienteRepositoryInMemory();
+    beforeEach(() => {
+        clienteRepository = new ClienteRepositoryInMemory();
+    })
 
     test('should create a new client', async () => {
         const clienteProps: ClienteProps = {
@@ -13,26 +16,49 @@ describe('Cliente usecases', () => {
             email: 'joão@joão.com.br',
             cpf: '360.635.210-70'
         }
-        const novoCliente = await ClienteUseCases.CriarCliente(clienteRepository, clienteProps)
+        const novoCliente = await ClienteUseCases.CriarCliente(clienteRepository, clienteProps);
         const clientes = await ClienteUseCases.BuscarTodosClientes(clienteRepository);
 
-        expect(novoCliente).toBeDefined()
-        expect(novoCliente?.id).toBe('1')
-        expect(novoCliente?.nome).toBe('João')
-        expect(novoCliente?.email).toBe('joão@joão.com.br')
-        expect(novoCliente?.cpf).toBe('36063521070')
-        expect(clientes).toBeDefined()
-        expect(clientes).toHaveLength(1)
-    })
+        expect(novoCliente).toBeDefined();
+        expect(novoCliente?.id).toBe('1');
+        expect(novoCliente?.nome).toBe('João');
+        expect(novoCliente?.email).toBe('joão@joão.com.br');
+        expect(novoCliente?.cpf).toBe('36063521070');
+        expect(clientes).toBeDefined();
+        expect(clientes).toHaveLength(1);
+    });
+
+    test('should create a new client, with error Cliente já cadastrado', async () => {
+        const clienteProps: ClienteProps = {
+            id: '1',
+            nome: 'João',
+            email: 'joão@joão.com.br',
+            cpf: '360.635.210-70'
+        }
+        await ClienteUseCases.CriarCliente(clienteRepository, clienteProps);
+        try {
+            await ClienteUseCases.CriarCliente(clienteRepository, clienteProps);
+        } catch (error: any) {
+            expect(error.message).toBe('Cliente já cadastrado');
+        }
+
+    });
 
     test('should find a client by CPF', async () => {
+        const clienteProps: ClienteProps = {
+            id: '1',
+            nome: 'João',
+            email: 'joão@joão.com.br',
+            cpf: '360.635.210-70'
+        }
+        await ClienteUseCases.CriarCliente(clienteRepository, clienteProps);
         const cliente = await ClienteUseCases.BuscarClientePorCPF(clienteRepository, '36063521070');
-        
-        expect(cliente).toBeDefined()
-        expect(cliente?.id).toBe('1')
-        expect(cliente?.nome).toBe('João')
-        expect(cliente?.email).toBe('joão@joão.com.br')
-        expect(cliente?.cpf).toBe('36063521070')
-    })
 
-})
+        expect(cliente).toBeDefined();
+        expect(cliente?.id).toBe('1');
+        expect(cliente?.nome).toBe('João');
+        expect(cliente?.email).toBe('joão@joão.com.br');
+        expect(cliente?.cpf).toBe('36063521070');
+    });
+});
+

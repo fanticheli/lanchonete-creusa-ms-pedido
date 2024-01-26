@@ -19,10 +19,6 @@ export class PedidoUseCases {
 			const produtoEncontrado =
 				await produtoGatewayInterface.BuscarProdutoPorID(produto);
 
-			if (!produtoEncontrado) {
-				throw new Error(`Produto: ${produto} não encontrado`);
-			}
-
 			novoPedido.valorTotal =
 				novoPedido.valorTotal + produtoEncontrado.valor;
 		}
