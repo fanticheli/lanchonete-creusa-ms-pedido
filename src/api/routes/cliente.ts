@@ -24,7 +24,7 @@ const clienteRepositoryInMongo = new ClienteRepositoryInMongo();
  */
 router.get("/", async (req, res) => {
 	res.setHeader("Content-type", "application/json");
-	res.json(
+	return res.json(
 		await ClienteController.BuscarTodosClientes(clienteRepositoryInMongo)
 	);
 });
@@ -57,7 +57,7 @@ router.get("/", async (req, res) => {
  *         description: Usuário criado com sucesso.
  */
 router.post("/", async (req: Request, res: Response) => {
-	await ClienteController.CriarCliente(clienteRepositoryInMongo, req.body)
+	return await ClienteController.CriarCliente(clienteRepositoryInMongo, req.body)
 		.then((response: any) => {
 			res.status(201).send(response);
 		})
@@ -86,7 +86,7 @@ router.post("/", async (req: Request, res: Response) => {
  */
 router.get("/cpf/:cpf", async (req, res) => {
 	res.setHeader("Content-type", "application/json");
-	res.json(
+	return res.json(
 		await ClienteController.BuscarClientePorCPF(clienteRepositoryInMongo, req.params.cpf)
 	);
 });

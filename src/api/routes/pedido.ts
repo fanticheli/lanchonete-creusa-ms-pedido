@@ -38,7 +38,7 @@ const produtoRepositoryInMongo = new ProdutoRepositoryInMongo();
  *         description: Pedido criado com sucesso.
  */
 router.post("/checkout", async (req: Request, res: Response) => {
-	await PedidoController.CriarPedido(
+	return await PedidoController.CriarPedido(
 		pedidoRepositoryInMongo,
 		produtoRepositoryInMongo,
 		req.body
@@ -82,7 +82,7 @@ router.post("/checkout", async (req: Request, res: Response) => {
 router.put("/status-pagamento/:codigo", async (req: Request, res: Response) => {
 	const statusPagamento = req.body.statusPagamento;
 
-	await PedidoController.AlterarStatusPagamentoPedido(
+	return await PedidoController.AlterarStatusPagamentoPedido(
 		pedidoRepositoryInMongo,
 		req.params.codigo,
 		statusPagamento
