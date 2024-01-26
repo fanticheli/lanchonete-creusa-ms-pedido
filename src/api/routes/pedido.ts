@@ -44,10 +44,10 @@ router.post("/checkout", async (req: Request, res: Response) => {
 		req.body
 	)
 		.then((response: any) => {
-			res.status(201).send(response);
+			return res.status(201).send(response);
 		})
 		.catch((err: any) => {
-			res.status(400).send({ message: err?.message });
+			return res.status(400).send({ message: err?.message });
 		});
 });
 
@@ -89,10 +89,10 @@ router.put("/status-pagamento/:codigo", async (req: Request, res: Response) => {
 		statusPagamento
 	)
 		.then((response: any) => {
-			res.status(200).send({ statusPagamento: response.statusPagamento });
+			return res.status(200).send({ statusPagamento: response.statusPagamento });
 		})
 		.catch((err: any) => {
-			res.status(400).send({ message: err?.message });
+			return res.status(400).send({ message: err?.message });
 		});
 });
 
@@ -127,16 +127,16 @@ router.put("/status-pagamento/:codigo", async (req: Request, res: Response) => {
 router.put("/:id/status-pedido", async (req: Request, res: Response) => {
 	const statusPedido = req.body.statusPedido;
 
-	await PedidoController.AlterarStatusPedido(
+	return await PedidoController.AlterarStatusPedido(
 		pedidoRepositoryInMongo,
 		req.params.id,
 		statusPedido
 	)
 		.then((response: any) => {
-			res.status(200).send({ statusPedido: response.statusPedido });
+			return res.status(200).send({ statusPedido: response.statusPedido });
 		})
 		.catch((err: any) => {
-			res.status(400).send({ message: err?.message });
+			return res.status(400).send({ message: err?.message });
 		});
 });
 

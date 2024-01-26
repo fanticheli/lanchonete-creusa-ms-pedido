@@ -59,10 +59,10 @@ router.get("/", async (req, res) => {
 router.post("/", async (req: Request, res: Response) => {
 	return await ClienteController.CriarCliente(clienteRepositoryInMongo, req.body)
 		.then((response: any) => {
-			res.status(201).send(response);
+			return res.status(201).send(response);
 		})
 		.catch((err: any) => {
-			res.status(400).send({ message: err?.message });
+			return res.status(400).send({ message: err?.message });
 		});
 });
 

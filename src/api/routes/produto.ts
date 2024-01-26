@@ -41,10 +41,10 @@ const produtoRepositoryInMongo = new ProdutoRepositoryInMongo();
 router.post("/", async (req: Request, res: Response) => {
 	return await ProdutoController.CriarProduto(produtoRepositoryInMongo, req.body)
 		.then((response: any) => {
-			res.status(201).send(response);
+			return res.status(201).send(response);
 		})
 		.catch((err: any) => {
-			res.status(400).send({ message: err?.message });
+			return res.status(400).send({ message: err?.message });
 		});
 });
 
@@ -67,8 +67,8 @@ router.post("/", async (req: Request, res: Response) => {
  *         description: Produto encontrado
  */
 router.get("/descricao/:descricao", async (req, res) => {
-	return res.setHeader("Content-type", "application/json");
-	res.json(
+	res.setHeader("Content-type", "application/json");
+	return res.json(
 		await ProdutoController.BuscarProdutoPorDescricao(
 			produtoRepositoryInMongo,
 			req.params.descricao
@@ -95,8 +95,8 @@ router.get("/descricao/:descricao", async (req, res) => {
  *         description: Produto encontrado
  */
 router.get("/categoria/:categoria", async (req, res) => {
-	return res.setHeader("Content-type", "application/json");
-	res.json(
+	res.setHeader("Content-type", "application/json");
+	return res.json(
 		await ProdutoController.BuscarProdutoPorCategoria(
 			produtoRepositoryInMongo,
 			req.params.categoria
@@ -137,10 +137,10 @@ router.get("/categoria/:categoria", async (req, res) => {
 router.put("/", async (req: Request, res: Response) => {
 	return await ProdutoController.EditarProduto(produtoRepositoryInMongo, req.body)
 		.then((response: any) => {
-			res.status(204).send(response);
+			return res.status(204).send(response);
 		})
 		.catch((err: any) => {
-			res.status(400).send({ message: err?.message });
+			return res.status(400).send({ message: err?.message });
 		});
 });
 
@@ -168,10 +168,10 @@ router.delete("/:id", async (req: Request, res: Response) => {
 		req.params.id
 	)
 		.then((response: any) => {
-			res.status(201).send(response);
+			return res.status(201).send(response);
 		})
 		.catch((err: any) => {
-			res.status(400).send({ message: err?.message });
+			return res.status(400).send({ message: err?.message });
 		});
 });
 
