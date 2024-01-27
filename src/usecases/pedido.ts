@@ -50,7 +50,7 @@ export class PedidoUseCases {
 			return pagamento.data;
 		}
 		catch (error) {
-			throw new Error('Não foi possível realizar o pagamento');
+			throw error;
 		}
 	}
 
