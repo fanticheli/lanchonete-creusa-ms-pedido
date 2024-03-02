@@ -55,7 +55,7 @@ jobs:
 
       - name: Deploy to AKS
         run: |
-          kubectl apply -f k8s --force && kubectl apply -f k8s/rabbitmq --force && kubectl apply -f k8s/ms-pedido --force
+          kubectl apply -f k8s --force && kubectl apply -f k8s/ms-pedido --force
         working-directory: /tmp/k8s-manifests
 
       - name: Logout from Azure
