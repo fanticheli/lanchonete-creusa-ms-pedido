@@ -35,8 +35,4 @@ jobs:
         run: npm install
       - name: Test and coverage
         run: npm test
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}      
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}       
+            
