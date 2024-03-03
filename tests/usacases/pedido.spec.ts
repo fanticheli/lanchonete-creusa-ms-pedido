@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from "axios";
+import amqp from 'amqplib';
 import { CategoriaEnum } from "../../src/common/enum/categoria-enum";
 import { StatusPagamentoEnum } from "../../src/common/enum/status-pagamento-enum";
 import { StatusPedidoEnum } from "../../src/common/enum/status-pedido-enum";
@@ -8,11 +8,31 @@ import { PedidoRepositoryInMemory } from "../../src/external/memory/pedido.repos
 import { ProdutoRepositoryInMemory } from "../../src/external/memory/produto.repository";
 import { PedidoUseCases } from "../../src/usecases/pedido";
 import { ProdutoUseCases } from "../../src/usecases/produtos";
-import { PedidoOutput } from "../../src/adapters/pedido";
-import exp from "constants";
 
-jest.mock('axios');
+jest.mock('amqplib');
+class MockChannel {
+	assertQueue() {
+		return Promise.resolve();
+	}
 
+	sendToQueue() {
+		return Promise.resolve();
+	}
+}
+
+class MockConnection {
+	createConfirmChannel() {
+		return Promise.resolve(new MockChannel());
+	}
+
+	createChannel() {
+		return Promise.resolve(new MockChannel());
+	}
+
+	close() {
+		return Promise.resolve();
+	}
+}
 describe("Pedido", () => {
 	let produtoRepository = new ProdutoRepositoryInMemory();
 	let pedidoRepository = new PedidoRepositoryInMemory();
@@ -24,13 +44,7 @@ describe("Pedido", () => {
 	});
 
 	test("Deve criar um pedido", async () => {
-		const mockResponse = {
-			data: {
-				codigoPix: "123456789",
-			},
-		};
-
-		(axios.post as jest.Mock).mockImplementation(() => Promise.resolve(mockResponse));
+		(amqp.connect as jest.Mock).mockImplementation(() => Promise.resolve(new MockConnection()));
 
 		const produtoProps: ProdutoProps = {
 			id: "1",
@@ -156,7 +170,7 @@ describe("Pedido", () => {
 			},
 		};
 
-		(axios.post as jest.Mock).mockImplementation(() => Promise.resolve(mockResponse));
+		(amqp.connect as jest.Mock).mockImplementation(() => Promise.resolve(new MockConnection()));
 
 		const pedidoProps: PedidoProps = {
 			produtos: ['1'],

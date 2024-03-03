@@ -1,4 +1,3 @@
-import axios from 'axios';
 import amqp from 'amqplib';
 import { PedidoOutput } from "../adapters/pedido";
 import { Pedido } from "../entities/pedido.entity";
@@ -55,7 +54,7 @@ export class PedidoUseCases {
 			return true;
 		}
 		catch (error) {
-			throw error;
+			throw new Error('Meio de pagamento não configurado');
 		}
 	}
 
@@ -123,7 +122,7 @@ export class PedidoUseCases {
 			return true;
 		}
 		catch (error) {
-			throw error;			
+			throw error;
 		}
 	}
 
