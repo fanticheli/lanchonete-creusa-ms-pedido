@@ -18,7 +18,6 @@ describe("Pedido", () => {
 	let pedidoRepository = new PedidoRepositoryInMemory();
 
 	beforeEach(() => {
-		process.env.URL_MS_PAGAMENTO = 'http://localhost:0000/api/pagamentos'
 		produtoRepository = new ProdutoRepositoryInMemory();
 		pedidoRepository = new PedidoRepositoryInMemory();
 		jest.clearAllMocks();
@@ -120,8 +119,6 @@ describe("Pedido", () => {
 	});
 
 	test("Ao criar um pedido, Meio de pagamento não configurado", async () => {
-		process.env.URL_MS_PAGAMENTO = ''
-
 		const produtoProps: ProdutoProps = {
 			id: "1",
 			descricao: "Produto 1",
@@ -170,7 +167,7 @@ describe("Pedido", () => {
 			statusPedido: StatusPedidoEnum.RECEBIDO,
 		};
 
-		const novoPagamento = await PedidoUseCases.CriarPagamento(pedidoProps);
+		const novoPagamento = await PedidoUseCases.EnviarParaPagamento(pedidoProps);
 
 		expect(novoPagamento).toBeDefined();
 	});
@@ -183,19 +180,19 @@ describe("Pedido", () => {
 		};
 
 
-		const codigoPagamento = '123456789';
+		const numeroPedido = 123456789;
 		const statusPagamento = StatusPagamentoEnum.NEGADO;
 
-		pedidoRepository.BuscarPedidoPorCodigoPagamento = jest.fn().mockResolvedValue(pedidoEncontradoMock);
+		pedidoRepository.BuscarPedidoPorNumero = jest.fn().mockResolvedValue(pedidoEncontradoMock);
 
 		const updatedPedido = await PedidoUseCases.AlterarStatusPagamentoPedido(
 			pedidoRepository,
 			produtoRepository,
-			codigoPagamento,
+			numeroPedido,
 			statusPagamento
 		);
 
-		expect(pedidoRepository.BuscarPedidoPorCodigoPagamento).toHaveBeenCalledWith(codigoPagamento);
+		expect(pedidoRepository.BuscarPedidoPorNumero).toHaveBeenCalledWith(numeroPedido);
 
 		//expect(pedidoRepository.EditarPedido).toHaveBeenCalledWith(expect.anything(pedidoProps));
 
@@ -216,15 +213,15 @@ describe("Pedido", () => {
 			statusPedido: StatusPedidoEnum.RECEBIDO,
 		};
 
-		const codigoPagamento = '123456789';
+		const numeroPedido = 123456789;
 
-		pedidoRepository.BuscarPedidoPorCodigoPagamento = jest.fn().mockResolvedValue(pedidoEncontradoMock);
+		pedidoRepository.BuscarPedidoPorNumero = jest.fn().mockResolvedValue(pedidoEncontradoMock);
 
 		try {
 			await PedidoUseCases.AlterarStatusPagamentoPedido(
 				pedidoRepository,
 				produtoRepository,
-				codigoPagamento,
+				numeroPedido,
 				'statusPagamento' as any
 			);
 		} catch (error: any) {
@@ -237,7 +234,7 @@ describe("Pedido", () => {
 			await PedidoUseCases.AlterarStatusPagamentoPedido(
 				pedidoRepository,
 				produtoRepository,
-				'codigoPagamento',
+				123,
 				StatusPagamentoEnum.APROVADO
 			);
 		} catch (error: any) {
