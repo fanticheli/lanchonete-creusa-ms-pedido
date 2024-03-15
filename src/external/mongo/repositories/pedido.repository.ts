@@ -35,12 +35,12 @@ export class PedidoRepositoryInMongo implements IPedidoGateway {
 		return pedidoEncontrado;
 	}
 
-	async BuscarPedidoPorCodigoPagamento(codigoPagamento: string): Promise<PedidoOutput | null> {
-		if (!codigoPagamento) {
-			throw new Error("Código de pagamento inválido");
+	async BuscarPedidoPorNumero(numeroPedido: number): Promise<PedidoOutput | null> {
+		if (!numeroPedido) {
+			throw new Error("Numero do pedido inválido");
 		}
 
-		const pedidoEncontrado = await this._model.findOne({codigoParaPagamento: codigoPagamento});
+		const pedidoEncontrado = await this._model.findOne({ numeroPedido });
 
 		if (!pedidoEncontrado) {
 			return null;

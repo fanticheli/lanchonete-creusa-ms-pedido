@@ -26,14 +26,14 @@ export class PedidoController {
 	static async AlterarStatusPagamentoPedido(
 		pedidoGatewayInterface: IPedidoGateway,
 		produtoGatewayInterface: IProdutoGateway,
-		codigoPagamento: string,
+		numeroPedido: number,
 		statusPagamento: StatusPagamentoEnum
 	): Promise<PedidoOutput | null> {
 		try {
 			return await PedidoUseCases.AlterarStatusPagamentoPedido(
 				pedidoGatewayInterface,
 				produtoGatewayInterface,
-				codigoPagamento,
+				numeroPedido,
 				statusPagamento
 			);
 		} catch (error) {

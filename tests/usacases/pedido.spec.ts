@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from "axios";
+import amqp from 'amqplib';
 import { CategoriaEnum } from "../../src/common/enum/categoria-enum";
 import { StatusPagamentoEnum } from "../../src/common/enum/status-pagamento-enum";
 import { StatusPedidoEnum } from "../../src/common/enum/status-pedido-enum";
@@ -8,30 +8,43 @@ import { PedidoRepositoryInMemory } from "../../src/external/memory/pedido.repos
 import { ProdutoRepositoryInMemory } from "../../src/external/memory/produto.repository";
 import { PedidoUseCases } from "../../src/usecases/pedido";
 import { ProdutoUseCases } from "../../src/usecases/produtos";
-import { PedidoOutput } from "../../src/adapters/pedido";
-import exp from "constants";
 
-jest.mock('axios');
+jest.mock('amqplib');
+class MockChannel {
+	assertQueue() {
+		return Promise.resolve();
+	}
 
+	sendToQueue() {
+		return Promise.resolve();
+	}
+}
+
+class MockConnection {
+	createConfirmChannel() {
+		return Promise.resolve(new MockChannel());
+	}
+
+	createChannel() {
+		return Promise.resolve(new MockChannel());
+	}
+
+	close() {
+		return Promise.resolve();
+	}
+}
 describe("Pedido", () => {
 	let produtoRepository = new ProdutoRepositoryInMemory();
 	let pedidoRepository = new PedidoRepositoryInMemory();
 
 	beforeEach(() => {
-		process.env.URL_MS_PAGAMENTO = 'http://localhost:0000/api/pagamentos'
 		produtoRepository = new ProdutoRepositoryInMemory();
 		pedidoRepository = new PedidoRepositoryInMemory();
 		jest.clearAllMocks();
 	});
 
 	test("Deve criar um pedido", async () => {
-		const mockResponse = {
-			data: {
-				codigoPix: "123456789",
-			},
-		};
-
-		(axios.post as jest.Mock).mockImplementation(() => Promise.resolve(mockResponse));
+		(amqp.connect as jest.Mock).mockImplementation(() => Promise.resolve(new MockConnection()));
 
 		const produtoProps: ProdutoProps = {
 			id: "1",
@@ -120,8 +133,6 @@ describe("Pedido", () => {
 	});
 
 	test("Ao criar um pedido, Meio de pagamento não configurado", async () => {
-		process.env.URL_MS_PAGAMENTO = ''
-
 		const produtoProps: ProdutoProps = {
 			id: "1",
 			descricao: "Produto 1",
@@ -159,7 +170,7 @@ describe("Pedido", () => {
 			},
 		};
 
-		(axios.post as jest.Mock).mockImplementation(() => Promise.resolve(mockResponse));
+		(amqp.connect as jest.Mock).mockImplementation(() => Promise.resolve(new MockConnection()));
 
 		const pedidoProps: PedidoProps = {
 			produtos: ['1'],
@@ -170,7 +181,7 @@ describe("Pedido", () => {
 			statusPedido: StatusPedidoEnum.RECEBIDO,
 		};
 
-		const novoPagamento = await PedidoUseCases.CriarPagamento(pedidoProps);
+		const novoPagamento = await PedidoUseCases.EnviarParaPagamento(pedidoProps);
 
 		expect(novoPagamento).toBeDefined();
 	});
@@ -183,19 +194,19 @@ describe("Pedido", () => {
 		};
 
 
-		const codigoPagamento = '123456789';
+		const numeroPedido = 123456789;
 		const statusPagamento = StatusPagamentoEnum.NEGADO;
 
-		pedidoRepository.BuscarPedidoPorCodigoPagamento = jest.fn().mockResolvedValue(pedidoEncontradoMock);
+		pedidoRepository.BuscarPedidoPorNumero = jest.fn().mockResolvedValue(pedidoEncontradoMock);
 
 		const updatedPedido = await PedidoUseCases.AlterarStatusPagamentoPedido(
 			pedidoRepository,
 			produtoRepository,
-			codigoPagamento,
+			numeroPedido,
 			statusPagamento
 		);
 
-		expect(pedidoRepository.BuscarPedidoPorCodigoPagamento).toHaveBeenCalledWith(codigoPagamento);
+		expect(pedidoRepository.BuscarPedidoPorNumero).toHaveBeenCalledWith(numeroPedido);
 
 		//expect(pedidoRepository.EditarPedido).toHaveBeenCalledWith(expect.anything(pedidoProps));
 
@@ -216,15 +227,15 @@ describe("Pedido", () => {
 			statusPedido: StatusPedidoEnum.RECEBIDO,
 		};
 
-		const codigoPagamento = '123456789';
+		const numeroPedido = 123456789;
 
-		pedidoRepository.BuscarPedidoPorCodigoPagamento = jest.fn().mockResolvedValue(pedidoEncontradoMock);
+		pedidoRepository.BuscarPedidoPorNumero = jest.fn().mockResolvedValue(pedidoEncontradoMock);
 
 		try {
 			await PedidoUseCases.AlterarStatusPagamentoPedido(
 				pedidoRepository,
 				produtoRepository,
-				codigoPagamento,
+				numeroPedido,
 				'statusPagamento' as any
 			);
 		} catch (error: any) {
@@ -237,7 +248,7 @@ describe("Pedido", () => {
 			await PedidoUseCases.AlterarStatusPagamentoPedido(
 				pedidoRepository,
 				produtoRepository,
-				'codigoPagamento',
+				123,
 				StatusPagamentoEnum.APROVADO
 			);
 		} catch (error: any) {

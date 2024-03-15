@@ -1,4 +1,4 @@
-import axios from 'axios';
+import amqp from 'amqplib';
 import { PedidoOutput } from "../adapters/pedido";
 import { Pedido } from "../entities/pedido.entity";
 import { PedidoProps } from "../entities/props/pedido.props";
@@ -26,47 +26,49 @@ export class PedidoUseCases {
 		novoPedido.numeroPedido =
 			await pedidoGatewayInterface.NumeroNovoPedido();
 
-		const pagamento = await PedidoUseCases.CriarPagamento(novoPedido);
+		const wasPublished = await PedidoUseCases.EnviarParaPagamento(novoPedido);
 
-		novoPedido.codigoParaPagamento = pagamento.codigoPix;
+		if (!wasPublished) {
+			throw new Error('Não foi possível enviar o pedido para pagamento');
+		}
 
 		return pedidoGatewayInterface.CriarPedido(novoPedido.object);
 	}
 
-	static async CriarPagamento(
-		pedido: PedidoOutput
-	) {
-		const apiUrl = process.env.URL_MS_PAGAMENTO || '';
-
-		if (!apiUrl) {
-			throw new Error('Meio de pagamento não configurado');
-		}
-
+	static async EnviarParaPagamento(pedido: PedidoOutput) {
 		try {
-			const pagamento = await axios.post(apiUrl, {
+			const connection = await amqp.connect(process.env.QUEUE_HOST || '');
+			const channel = await connection.createConfirmChannel();
+			const queueName = process.env.QUEUE_PEDIDOS_NAME || '';
+			await channel.assertQueue(queueName, { durable: true });
+			const messageContent = JSON.stringify({
+				id: pedido.id,
+				cliente: pedido.cliente,
 				valorTotal: pedido.valorTotal,
+				numeroPedido: pedido.numeroPedido
 			});
-
-			return pagamento.data;
+			await channel.sendToQueue(queueName, Buffer.from(messageContent), undefined, (err) => {
+				if (err !== null) throw err;
+				connection.close();
+			});
+			return true;
 		}
 		catch (error) {
-			throw error;
+			throw new Error('Meio de pagamento não configurado');
 		}
 	}
 
 	static async AlterarStatusPagamentoPedido(
 		pedidoGatewayInterface: IPedidoGateway,
 		produtoGatewayInterface: IProdutoGateway,
-		codigoPagamento: string,
+		numeroPedido: number,
 		statusPagamento: StatusPagamentoEnum
 	): Promise<PedidoOutput> {
 		if (!Object.values(StatusPagamentoEnum).includes(statusPagamento)) {
 			throw new Error("Status de pedido inválido");
 		}
 
-		const pedidoEncontrado = await pedidoGatewayInterface.BuscarPedidoPorCodigoPagamento(
-			codigoPagamento
-		);
+		const pedidoEncontrado = await pedidoGatewayInterface.BuscarPedidoPorNumero(numeroPedido);
 
 		if (!pedidoEncontrado) {
 			throw new Error("Pedido não encontrado");
@@ -79,7 +81,11 @@ export class PedidoUseCases {
 		} else if (statusPagamento === StatusPagamentoEnum.APROVADO) {
 			pedidoEncontrado.statusPedido = StatusPedidoEnum.PREPARACAO;
 
-			await PedidoUseCases.MandarPedidoParaProducao(pedidoEncontrado, produtoGatewayInterface);
+			const wasPublished = await PedidoUseCases.MandarPedidoParaProducao(pedidoEncontrado, produtoGatewayInterface);
+
+			if (!wasPublished) {
+				throw new Error('Não foi possível enviar o pedido para produção');
+			}
 		}
 
 		return pedidoGatewayInterface.EditarPedido(pedidoEncontrado);
@@ -88,39 +94,36 @@ export class PedidoUseCases {
 	static async MandarPedidoParaProducao(
 		pedido: PedidoOutput,
 		produtoGatewayInterface: IProdutoGateway
-	): Promise<any> {
-
-		const apiUrl = process.env.URL_MS_PRODUCAO || '';
-
-		if (!apiUrl) {
-			throw new Error('Webhook de PRODUÇÃO não configurado');
-		}
-
+	): Promise<boolean> {
 		try {
-
 			const produtos = await Promise.all(pedido.produtos.map(async (produto) => {
 				const produtoEncontrado = await produtoGatewayInterface.BuscarProdutoPorID(produto);
-	
+
 				if (!produtoEncontrado) {
 					throw new Error(`Produto: ${produto} não encontrado`);
 				}
-	
-				return {descricao: produtoEncontrado.descricao, valor: produtoEncontrado.valor};
-			}));
 
-			const result = await axios.post(`${apiUrl}`, {
+				return { descricao: produtoEncontrado.descricao, valor: produtoEncontrado.valor };
+			}));
+			const connection = await amqp.connect(process.env.QUEUE_HOST || '');
+			const channel = await connection.createConfirmChannel();
+			const queueName = process.env.QUEUE_PRODUCAO_NAME || '';
+			await channel.assertQueue(queueName, { durable: true });
+			const messageContent = JSON.stringify({
 				"id": pedido.id,
 				"cliente": pedido.cliente,
 				"produtos": produtos,
 				"numeroPedido": pedido.numeroPedido
 			});
-
-			return result.data;
+			await channel.sendToQueue(queueName, Buffer.from(messageContent), undefined, (err) => {
+				if (err !== null) throw err;
+				connection.close();
+			});
+			return true;
 		}
 		catch (error) {
-			throw new Error('Não foi possível chamar o webhook de produção');
+			throw error;
 		}
-
 	}
 
 	static async AlterarStatusPedido(

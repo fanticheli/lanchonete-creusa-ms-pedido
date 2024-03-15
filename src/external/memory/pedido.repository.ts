@@ -31,9 +31,9 @@ export class PedidoRepositoryInMemory implements IPedidoGateway {
 		return pedidoEncontrado.object;
 	}
 
-	async BuscarPedidoPorCodigoPagamento(codigoPagamento: string): Promise<PedidoOutput | null> {
+	async BuscarPedidoPorNumero(numeroPedido: number): Promise<PedidoOutput | null> {
 		const pedidoEncontrado = this.pedidos.find(
-			(pedido) => pedido.codigoParaPagamento === codigoPagamento
+			(pedido) => pedido.numeroPedido === numeroPedido
 		);
 
 		if (!pedidoEncontrado) {

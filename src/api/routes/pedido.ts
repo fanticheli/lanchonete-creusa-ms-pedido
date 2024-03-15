@@ -53,17 +53,17 @@ router.post("/checkout", async (req: Request, res: Response) => {
 
 /**
  * @swagger
- * /api/pedidos/status-pagamento/{codigo}:
+ * /api/pedidos/status-pagamento/{numeroPedido}:
  *   put:
- *     summary: Altera status de pagamento do pedido por código do pagamento.
+ *     summary: Altera status de pagamento do pedido por numero do pedido.
  *     tags: [Pedido]
  *     parameters:
  *       - in: path
- *         name: codigo
+ *         name: numeroPedido
  *         required: true
  *         schema:
  *           type: string
- *         description: Código do pagamento do pedido a ser alterado.
+ *         description: Numero do pedido a ser alterado.
  *     requestBody:
  *       required: true
  *       content:
@@ -79,13 +79,13 @@ router.post("/checkout", async (req: Request, res: Response) => {
  *       200:
  *         description: Status de pagamento do pedido alterado com sucesso.
  */
-router.put("/status-pagamento/:codigo", async (req: Request, res: Response) => {
+router.put("/status-pagamento/:numeroPedido", async (req: Request, res: Response) => {
 	const statusPagamento = req.body.statusPagamento;
 
 	return await PedidoController.AlterarStatusPagamentoPedido(
 		pedidoRepositoryInMongo,
 		produtoRepositoryInMongo,
-		req.params.codigo,
+		+req.params.numeroPedido,
 		statusPagamento
 	)
 		.then((response: any) => {
