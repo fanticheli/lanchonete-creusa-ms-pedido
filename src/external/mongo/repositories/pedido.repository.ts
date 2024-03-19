@@ -58,4 +58,12 @@ export class PedidoRepositoryInMongo implements IPedidoGateway {
 			new: true,
 		});
 	}
+
+	async BuscarPedidosPorCliente(cliente: string): Promise<PedidoOutput[] | null> {
+		if (!cliente) {
+			throw new Error("Cliente inválido");
+		}
+
+		return await this._model.find({ cliente });
+	}
 }

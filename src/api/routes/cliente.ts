@@ -1,9 +1,11 @@
 import express, { Request, Response } from "express";
 import { ClienteController } from "../../controllers/cliente.controller";
 import { ClienteRepositoryInMongo } from "../../external/mongo/repositories/cliente.repository";
+import { PedidoRepositoryInMongo } from "../../external/mongo/repositories/pedido.repository";
 
 const router = express.Router();
 const clienteRepositoryInMongo = new ClienteRepositoryInMongo();
+const pedidoRepositoryInMongo = new PedidoRepositoryInMongo();
 
 /**
  * @swagger
@@ -91,6 +93,37 @@ router.get("/cpf/:cpf", async (req, res) => {
 	);
 });
 
+/**
+ * @swagger
+ * /api/clientes/cpf/{cpf}:
+ *   delete:
+ *     summary: Deleta cliente por CPF
+ *     tags: [Cliente]
+ *     parameters:
+ *       - in: path
+ *         name: cpf
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: CPF do cliente a ser deletado.
+ *     description: Deleta cliente com o CPF informado.
+ *     responses:
+ *       200:
+ *         description: Cliente deletado com sucesso
+ */
+router.delete("/cpf/:cpf", async (req, res) => {
+	res.setHeader("Content-type", "application/json");
 
+	const response = await ClienteController.DeletarClientePorCPF(
+		clienteRepositoryInMongo,
+		pedidoRepositoryInMongo,
+		req.params.cpf);
+
+	if (response) {
+		return res.json({ message: "Cliente deletado com sucesso" });
+	}
+
+	return res.json({ message: "Cliente não deletado" });
+});
 
 module.exports = router;

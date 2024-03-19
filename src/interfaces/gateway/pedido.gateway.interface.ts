@@ -7,4 +7,5 @@ export interface IPedidoGateway {
     BuscarPedidoPorID(pedidoID: string): Promise<PedidoOutput | null>;
     BuscarPedidoPorNumero(numeroPedido: number): Promise<PedidoOutput | null>;
     EditarPedido(pedidoEditar: PedidoProps): Promise<PedidoOutput>;
+    BuscarPedidosPorCliente(clienteCPF: string): Promise<PedidoOutput[] | null>;
 }
