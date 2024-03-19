@@ -57,4 +57,16 @@ export class PedidoRepositoryInMemory implements IPedidoGateway {
 
 		return editarPedidoDTO;
 	}
+
+	async BuscarPedidosPorCliente(clienteCPF: string): Promise<PedidoOutput[] | null> {
+		const pedidosCliente = this.pedidos.filter(
+			(pedido) => pedido.cliente === clienteCPF
+		);
+
+		if (pedidosCliente.length === 0) {
+			return null;
+		}
+
+		return pedidosCliente.map((pedido) => pedido.object);
+	}
 }
