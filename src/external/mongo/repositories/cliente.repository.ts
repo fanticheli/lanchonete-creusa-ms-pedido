@@ -22,4 +22,8 @@ export class ClienteRepositoryInMongo implements IClienteGateway {
 	async BuscarTodosClientes(): Promise<ClienteOutput[] | null> {
 		return await this._model.find();
 	}
+
+	async DeletaClientePorCPF(cpf: string): Promise<any> {
+		return await this._model.deleteOne({ cpf });
+	}
 }

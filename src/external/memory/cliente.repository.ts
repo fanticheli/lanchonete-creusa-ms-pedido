@@ -26,4 +26,16 @@ export class ClienteRepositoryInMemory implements IClienteGateway {
 	async BuscarTodosClientes(): Promise<ClienteOutput[] | null> {
 		return ClienteAdapter.adaptJsonClientes(this.clientes);
 	}
+
+	async DeletaClientePorCPF(cpf: string): Promise<any> {
+		const cliente = this.clientes.find((cliente) => cliente.cpf === cpf);
+
+		if (!cliente) {
+			return false;
+		}
+
+		this.clientes = this.clientes.filter(cliente => cliente.cpf !== cpf);
+
+		return true;
+	}
 }

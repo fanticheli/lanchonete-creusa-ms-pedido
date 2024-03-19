@@ -1,7 +1,9 @@
+import axios from "axios";
 import { ClienteOutput } from "../adapters/cliente";
 import { Cliente } from "../entities/cliente.entity";
 import { ClienteProps } from "../entities/props/cliente.props";
 import { IClienteGateway } from "../interfaces";
+import { IPedidoGateway } from "../interfaces/gateway/pedido.gateway.interface";
 
 export class ClienteUseCases {
 	static async CriarCliente(
@@ -30,5 +32,29 @@ export class ClienteUseCases {
 		clienteGatewayInterface: IClienteGateway
 	): Promise<ClienteOutput[] | null> {
 		return clienteGatewayInterface.BuscarTodosClientes();
+	}
+
+	static async DeletaClientePorCPF(
+		clienteGatewayInterface: IClienteGateway,
+		pedidoGatewayInterface: IPedidoGateway,
+		CPF: string
+	): Promise<boolean> {
+		const cliente = await clienteGatewayInterface.BuscarClientePorCPF(CPF);
+
+		if (!cliente || !cliente.id) {
+			throw new Error("Cliente não encontrado");
+		}
+
+		const pedidos = await pedidoGatewayInterface.BuscarPedidosPorCliente(cliente.id);
+
+		if (pedidos) {
+			for (const pedido of pedidos) {
+				await axios.delete(`${process.env.WEBHOOK_DELETE_PAGAMENTOS}/${pedido.numeroPedido}`);
+			}
+		}
+
+		await clienteGatewayInterface.DeletaClientePorCPF(CPF);
+
+		return true;
 	}
 }
